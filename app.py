@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -7,7 +7,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
 db = SQLAlchemy(app)
 
 # Database Model
-class Todo(db.Model):
+class Todo(db.Model): 
     sno = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     desc = db.Column(db.String(500), nullable=False)
@@ -29,10 +29,23 @@ def hello_world():
     return render_template('index.html', allTodo=allTodo)
 
 @app.route('/show')
-def products():
+def show():
     allTodo = Todo.query.all()
     print(allTodo)
-    return 'Products Page'
+    return 'Show Page'
+
+@app.route('/update')
+def update():
+    allTodo = Todo.query.all()
+    print(allTodo)
+    return 'update Page'
+
+@app.route('/delete/<int:sno>')
+def delete(sno):
+    allTodo = Todo.query.filter_by(sno=sno).first()
+    db.session.delete(allTodo)
+    db.session.commit()
+    return redirect('/')
 
 if __name__ == '__main__':
     # FIX: This automatically sets the application context and creates the database
